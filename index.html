@@ -1,0 +1,259 @@
+<!doctype html><html lang="tr"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#1d2a2e">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Sigara">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="icon" href="icon-192.png">
+<link rel="manifest" href="manifest.json">
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}[hidden]{display:none!important}</style>
+<title>Sigara Sayacı</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Figtree:wght@400;500;600&display=swap">
+<style>
+/* Layout: tek sütun, telefon odaklı; üstte bugünkü sayı + büyük düğme, altta süre, 14 gün grafiği, bugünün saatleri */
+:root{
+  --bg:#eef1f2; --surface:#ffffff; --ink:#1d2a2e; --muted:#5f6f74; --line:#d6dde0;
+  --ember:#d9622b; --ember-ink:#ffffff; --ember-soft:#f7e3d8;
+  --good:#2f7d5b; --warn:#b5651d; --bad:#b33a3a;
+  --f-display:"Bricolage Grotesque",ui-sans-serif,system-ui,sans-serif;
+  --f-body:"Figtree",ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#141b1d; --surface:#1d2629; --ink:#e7eef0; --muted:#93a4a9; --line:#2d3a3e;
+  --ember:#ef7a42; --ember-ink:#1a0f0a; --ember-soft:#3a2419;
+  --good:#5cbf93; --warn:#e3a35c; --bad:#e57373; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#141b1d; --surface:#1d2629; --ink:#e7eef0; --muted:#93a4a9; --line:#2d3a3e;
+  --ember:#ef7a42; --ember-ink:#1a0f0a; --ember-soft:#3a2419;
+  --good:#5cbf93; --warn:#e3a35c; --bad:#e57373; color-scheme:dark}
+html,body{background:var(--bg);color:var(--ink)}
+body{font-family:var(--f-body);font-size:15px;line-height:1.45;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px 40px}
+.wrap{max-width:460px;margin:0 auto;display:flex;flex-direction:column;gap:18px}
+header{display:flex;justify-content:space-between;align-items:baseline;gap:12px}
+h1{font-family:var(--f-display);font-weight:800;font-size:22px;margin:0;letter-spacing:-.01em}
+.date{color:var(--muted);font-size:13px}
+.hero{background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:22px 20px;display:flex;flex-direction:column;gap:16px}
+.countrow{display:flex;align-items:flex-end;justify-content:space-between;gap:12px}
+.count{font-family:var(--f-display);font-weight:800;font-size:84px;line-height:.9;font-variant-numeric:tabular-nums;letter-spacing:-.03em}
+.count small{font-size:26px;color:var(--muted);font-weight:500;letter-spacing:0}
+.status{font-size:13px;font-weight:600;padding:5px 10px;border-radius:99px;white-space:nowrap}
+.status.good{color:var(--good);background:color-mix(in srgb,var(--good) 14%,transparent)}
+.status.warn{color:var(--warn);background:color-mix(in srgb,var(--warn) 15%,transparent)}
+.status.bad{color:var(--bad);background:color-mix(in srgb,var(--bad) 14%,transparent)}
+.bar{height:8px;border-radius:99px;background:var(--line);overflow:hidden}
+.bar i{display:block;height:100%;background:var(--ember);border-radius:99px;transition:width .3s}
+.bar i.over{background:var(--bad)}
+.add{appearance:none;border:0;border-radius:16px;background:var(--ember);color:var(--ember-ink);
+  font-family:var(--f-display);font-weight:700;font-size:21px;padding:20px;cursor:pointer;
+  touch-action:manipulation;transition:transform .08s}
+.add:active{transform:scale(.97)}
+.add:focus-visible,button:focus-visible,input:focus-visible{outline:3px solid var(--ink);outline-offset:2px}
+.sub{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;font-size:13px;color:var(--muted)}
+.link{appearance:none;background:none;border:0;color:var(--muted);font:inherit;text-decoration:underline;cursor:pointer;padding:4px 0}
+.since{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.stat{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:12px 14px}
+.stat b{display:block;font-family:var(--f-display);font-size:22px;font-weight:700;font-variant-numeric:tabular-nums}
+.stat span{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+section h2{font-family:var(--f-display);font-weight:700;font-size:16px;margin:0 0 10px}
+.chart{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px 12px 10px}
+.chart svg{width:100%;height:auto;display:block}
+.times{display:flex;flex-wrap:wrap;gap:6px}
+.times span{font-variant-numeric:tabular-nums;font-size:13px;background:var(--ember-soft);color:var(--ink);padding:4px 9px;border-radius:8px}
+.empty{color:var(--muted);font-size:13px}
+.goal{display:flex;align-items:center;gap:10px;font-size:14px}
+.goal button{appearance:none;width:34px;height:34px;border-radius:10px;border:1px solid var(--line);background:var(--surface);color:var(--ink);font-size:18px;cursor:pointer}
+.goal b{font-variant-numeric:tabular-nums;min-width:2ch;text-align:center;font-size:17px}
+.note{font-size:12px;color:var(--muted)}
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:9px 16px;border-radius:99px;font-size:14px;opacity:0;pointer-events:none;transition:opacity .2s}
+.toast.on{opacity:1}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+</head><body>
+<div class="wrap">
+  <header><h1>Sigara Sayacı</h1><span class="date" id="today"></span></header>
+
+  <div class="hero">
+    <div class="countrow">
+      <div class="count" id="count">0<small> / 10</small></div>
+      <span class="status good" id="status">Hedefin altında</span>
+    </div>
+    <div class="bar"><i id="bar" style="width:0%"></i></div>
+    <button class="add" id="add">+1 Sigara içtim</button>
+    <div class="sub">
+      <span id="last">Bugün henüz yok</span>
+      <button class="link" id="undo" hidden>Son kaydı geri al</button>
+    </div>
+  </div>
+
+  <div class="since">
+    <div class="stat"><span>Bu hafta ort.</span><b id="wk">–</b></div>
+    <div class="stat"><span>Geçen hafta ort.</span><b id="pwk">–</b></div>
+  </div>
+
+  <section>
+    <h2>Son 14 gün</h2>
+    <div class="chart" id="chart"></div>
+  </section>
+
+  <section>
+    <h2>Bugünün saatleri</h2>
+    <div class="times" id="times"><span class="empty">Kayıt yok</span></div>
+  </section>
+
+  <section>
+    <h2>Günlük hedef</h2>
+    <div class="goal">
+      <button id="gminus" aria-label="Hedefi azalt">−</button>
+      <b id="goal">10</b>
+      <button id="gplus" aria-label="Hedefi artır">+</button>
+      <span class="note">sigara / gün</span>
+    </div>
+    <p class="note" id="sync">Kayıtlar bu cihazda tutuluyor.</p>
+  </section>
+</div>
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+(function(){
+  const $=id=>document.getElementById(id);
+  const LS="sigara-sayaci-v1";
+  // state: days = { "YYYY-MM-DD": ["HH:MM:SS ISO", ...] }, goal
+  let state={days:{},goal:10};
+  try{const s=JSON.parse(localStorage.getItem(LS)||"null");if(s&&s.days)state=s}catch(e){}
+  const saveLocal=()=>{try{localStorage.setItem(LS,JSON.stringify(state))}catch(e){}};
+
+  const pad=n=>String(n).padStart(2,"0");
+  const key=d=>d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate());
+  const todayKey=()=>key(new Date());
+  const fmtT=iso=>{const d=new Date(iso);return pad(d.getHours())+":"+pad(d.getMinutes())};
+  const cnt=k=>(state.days[k]||[]).length;
+
+  let db=null,col=null,goalRef=null;
+
+  function allTimes(){return Object.values(state.days).flat().sort()}
+
+  function since(){
+    const t=allTimes();if(!t.length)return null;
+    const ms=Date.now()-new Date(t[t.length-1]).getTime();
+    const m=Math.max(0,Math.floor(ms/60000)),h=Math.floor(m/60);
+    if(h>=24)return Math.floor(h/24)+" gün "+(h%24)+" sa";
+    return h?h+" sa "+(m%60)+" dk":m+" dk";
+  }
+
+  function avg(startOffset){ // 7 gün, startOffset gün önce biten
+    let sum=0,days=0;const now=new Date();
+    for(let i=startOffset;i<startOffset+7;i++){
+      const d=new Date(now);d.setDate(now.getDate()-i);const k=key(d);
+      if(i===0||state.days[k]!==undefined||hasEarlier(k)){sum+=cnt(k);days++}
+    }
+    return days?sum/days:null;
+  }
+  function hasEarlier(k){return Object.keys(state.days).some(x=>x<=k)}
+
+  function render(){
+    const k=todayKey(),c=cnt(k),g=state.goal;
+    $("today").textContent=new Date().toLocaleDateString("tr-TR",{weekday:"long",day:"numeric",month:"long"});
+    $("count").innerHTML=c+"<small> / "+g+"</small>";
+    const pct=Math.min(100,c/g*100);
+    $("bar").style.width=pct+"%";$("bar").classList.toggle("over",c>g);
+    const st=$("status");
+    if(c>g){st.className="status bad";st.textContent=(c-g)+" fazla"}
+    else if(c===g){st.className="status warn";st.textContent="Hedefe ulaştın"}
+    else{st.className="status good";st.textContent=(g-c)+" hakkın kaldı"}
+    const s=since();
+    $("last").textContent=s?"Son sigaradan beri: "+s:"Henüz kayıt yok";
+    $("undo").hidden=!c;
+    const times=state.days[k]||[];
+    $("times").innerHTML=times.length?times.map(t=>"<span>"+fmtT(t)+"</span>").join(""):'<span class="empty">Bugün kayıt yok</span>';
+    const w=avg(0),p=avg(7);
+    $("wk").textContent=w==null?"–":w.toFixed(1);
+    $("pwk").textContent=p==null?"–":p.toFixed(1);
+    $("goal").textContent=g;
+    drawChart();
+  }
+
+  function drawChart(){
+    const now=new Date(),data=[];
+    for(let i=13;i>=0;i--){const d=new Date(now);d.setDate(now.getDate()-i);data.push({d,c:cnt(key(d))})}
+    const W=420,H=170,L=26,R=6,T=12,B=26,max=Math.max(state.goal+2,...data.map(x=>x.c),4);
+    const step=(W-L-R)/data.length,bw=step*.62,y=v=>T+(H-T-B)*(1-v/max);
+    const cs=getComputedStyle(document.documentElement),col=n=>cs.getPropertyValue(n).trim();
+    let s='<svg viewBox="0 0 '+W+' '+H+'" role="img" aria-label="Son 14 günün sigara sayıları">';
+    const ticks=[0,Math.round(max/2),max];
+    ticks.forEach(t=>{s+='<line x1="'+L+'" x2="'+(W-R)+'" y1="'+y(t)+'" y2="'+y(t)+'" stroke="'+col("--line")+'" stroke-width="1"/>'+
+      '<text x="'+(L-6)+'" y="'+(y(t)+4)+'" text-anchor="end" font-size="10" fill="'+col("--muted")+'">'+t+'</text>'});
+    data.forEach((x,i)=>{
+      const cx=L+i*step+(step-bw)/2,h=y(0)-y(x.c),last=i===13;
+      const fill=x.c>state.goal?col("--bad"):(last?col("--ember"):col("--muted"));
+      if(x.c>0)s+='<rect x="'+cx+'" y="'+y(x.c)+'" width="'+bw+'" height="'+h+'" rx="3" fill="'+fill+'" opacity="'+(last?1:.55)+'"/>';
+      if(x.c>0)s+='<text x="'+(cx+bw/2)+'" y="'+(y(x.c)-3)+'" text-anchor="middle" font-size="9.5" fill="'+col("--ink")+'">'+x.c+'</text>';
+      if(i%2===1||last)s+='<text x="'+(cx+bw/2)+'" y="'+(H-8)+'" text-anchor="middle" font-size="10" fill="'+col("--muted")+'">'+x.d.getDate()+'</text>';
+    });
+    const gy=y(state.goal);
+    s+='<line x1="'+L+'" x2="'+(W-R)+'" y1="'+gy+'" y2="'+gy+'" stroke="'+col("--ember")+'" stroke-width="1.5" stroke-dasharray="4 4"/>'+
+       '<text x="'+(W-R)+'" y="'+(gy-4)+'" text-anchor="end" font-size="10" fill="'+col("--ember")+'">hedef '+state.goal+'</text></svg>';
+    $("chart").innerHTML=s;
+  }
+
+  let tt;function toast(m){const t=$("toast");t.textContent=m;t.classList.add("on");clearTimeout(tt);tt=setTimeout(()=>t.classList.remove("on"),1600)}
+
+  // one write at a time per doc
+  const pending={},busy={};
+  async function pushDay(k){
+    if(!col)return;pending[k]=true;if(busy[k])return;
+    busy[k]=true;
+    while(pending[k]){pending[k]=false;
+      try{const arr=state.days[k]||[];
+        if(arr.length)await col.doc(k).set({date:k,times:arr});else await col.doc(k).delete();
+      }catch(e){$("sync").textContent="Kaydedilemedi, bu cihazda tutuluyor."}}
+    busy[k]=false;
+  }
+  async function pushGoal(){if(!goalRef)return;try{await goalRef.set({goal:state.goal})}catch(e){}}
+
+  $("add").onclick=()=>{
+    const k=todayKey();(state.days[k]=state.days[k]||[]).push(new Date().toISOString());
+    saveLocal();render();pushDay(k);
+    if(navigator.vibrate)try{navigator.vibrate(30)}catch(e){}
+    toast("Eklendi: "+cnt(k)+". sigara");
+  };
+  $("undo").onclick=()=>{const k=todayKey();if(!cnt(k))return;state.days[k].pop();if(!state.days[k].length)delete state.days[k];saveLocal();render();pushDay(k);toast("Son kayıt silindi")};
+  let gt;function setGoal(v){state.goal=Math.max(1,Math.min(60,v));saveLocal();render();clearTimeout(gt);gt=setTimeout(pushGoal,600)}
+  $("gminus").onclick=()=>setGoal(state.goal-1);
+  $("gplus").onclick=()=>setGoal(state.goal+1);
+
+  render();
+  setInterval(render,60000);
+  window.matchMedia("(prefers-color-scheme: dark)").addEventListener?.("change",drawChart);
+
+  // Hesaba bağlı kayıt (varsa)
+  (async()=>{
+    try{
+      if(!window.claude?.use)return;
+      const [d,u]=await Promise.all([claude.use("db"),claude.use("user")]);
+      if(!d||!u)return;const id=await u.id();if(!id)return;
+      db=d;col=db.collection("data/users/"+id);goalRef=col.doc("hedef");
+      const timer=setTimeout(()=>{$("sync").textContent="Hesaba bağlanılamadı, bu cihazda tutuluyor."},10000);
+      const g=await goalRef.get();
+      if(g.exists&&typeof g.data().goal==="number")state.goal=g.data().goal;else pushGoal();
+      const local=JSON.parse(JSON.stringify(state.days));
+      col.onSnapshot(snap=>{
+        clearTimeout(timer);
+        const remote={};snap.docs.forEach(doc=>{const v=doc.data();if(v&&Array.isArray(v.times))remote[doc.id]=v.times});
+        // ilk senkronda yerel kayıtları birleştir
+        if(local){for(const k in local){const m=[...new Set([...(remote[k]||[]),...local[k]])].sort();if(m.length!==(remote[k]||[]).length){remote[k]=m;state.days=remote;pushDay(k)}}}
+        for(const k in pending)if(pending[k]||busy[k])remote[k]=state.days[k]||[];
+        state.days=remote;
+        Object.keys(local||{}).forEach(k=>delete local[k]);
+        saveLocal();render();
+        $("sync").textContent="Kayıtlar hesabına kaydediliyor, her cihazda görünür.";
+      },()=>{clearTimeout(timer);$("sync").textContent="Hesaba bağlanılamadı, bu cihazda tutuluyor."});
+    }catch(e){}
+  })();
+})();
+</script>
+
+</body></html>
